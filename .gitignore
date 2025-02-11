@@ -1,0 +1,8 @@
+# Java/Maven
+target/
+# Node/React
+node_modules/
+# OS/IDE
+.idea/
+.DS_Store
+

@@ -1,0 +1,42 @@
+import os
+from bs4 import BeautifulSoup
+
+def convert_ixbrl_to_text(html_file, output_txt):
+    # 1) Read the HTML
+    with open(html_file, "r", encoding="utf-8") as f:
+        html_content = f.read()
+
+    # 2) Parse with BeautifulSoup
+    soup = BeautifulSoup(html_content, "html.parser")
+
+    # 3) Remove hidden divs
+    for hidden_div in soup.find_all(style=lambda x: x and "display:none" in x):
+        hidden_div.decompose()
+
+    # 4) Either remove or rename iXBRL tags
+    #    Option 1: Remove them entirely
+    ixbrl_tags = soup.find_all(lambda tag: tag.name and tag.name.startswith("ix:"))
+    for tag in ixbrl_tags:
+        tag.decompose()  # removes them
+    
+    #    Option 2 (alternative approach): rename them to <span>
+    # for tag in ixbrl_tags:
+    #     tag.name = "span"
+    #     for attr in list(tag.attrs):
+    #         del tag.attrs[attr]
+
+    # 5) Extract text
+    plain_text = soup.get_text(separator="\n", strip=True)
+
+    # 6) Save to a .txt file
+    with open(output_txt, "w", encoding="utf-8") as out:
+        out.write(plain_text)
+
+    print(f"Converted iXBRL to text: {output_txt}")
+
+if __name__ == "__main__":
+    # Adjust these paths as needed
+    html_path = r"C:\Users\zhumi\OneDrive\Desktop\siai\apple_10k_2024.html"
+    txt_path  = r"C:\Users\zhumi\OneDrive\Desktop\siai\apple_10k_2024_text.txt"
+
+    convert_ixbrl_to_text(html_path, txt_path)

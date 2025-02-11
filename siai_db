@@ -1,0 +1,141 @@
+-- 1. Create database (if it doesn’t exist)
+CREATE DATABASE IF NOT EXISTS siai_db;
+
+-- 2. Use the database
+USE siai_db;
+
+CREATE TABLE company (
+    company_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    ticker VARCHAR(20) NOT NULL,
+    industry VARCHAR(255),
+    sector VARCHAR(255),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE sec_filing (
+    filing_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    filing_type ENUM('S-1','S-1A','10-K','10-Q','8-K','6-K','DEF 14A','SC 13G','SC 13G-A','13F') NOT NULL,
+    filing_date DATE NOT NULL,
+    filing_content LONGTEXT,
+    url VARCHAR(500),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_sec_filing_company
+        FOREIGN KEY (company_id) REFERENCES company(company_id)
+);
+
+CREATE TABLE financial_data (
+    fin_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    period_start DATE,
+    period_end DATE,
+    revenue DECIMAL(15,2),
+    net_income DECIMAL(15,2),
+    total_assets DECIMAL(15,2),
+    total_liabilities DECIMAL(15,2),
+    eps DECIMAL(10,4),
+    p_e_ratio DECIMAL(10,2),
+    ev_ebitda DECIMAL(10,2),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_financial_data_company
+        FOREIGN KEY (company_id) REFERENCES company(company_id)
+);
+
+CREATE TABLE market_data (
+    market_data_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT NOT NULL,
+    data_date DATETIME NOT NULL,
+    open_price DECIMAL(10,2),
+    close_price DECIMAL(10,2),
+    high_price DECIMAL(10,2),
+    low_price DECIMAL(10,2),
+    volume BIGINT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_market_data_company
+        FOREIGN KEY (company_id) REFERENCES company(company_id)
+);
+
+CREATE TABLE mergers_acquisitions (
+    ma_id INT AUTO_INCREMENT PRIMARY KEY,
+    acquiring_company_id INT NOT NULL,
+    acquired_company_id INT NOT NULL,
+    announcement_date DATE,
+    completion_date DATE,
+    deal_value DECIMAL(15,2),
+    details TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_ma_acquiring_company
+        FOREIGN KEY (acquiring_company_id) REFERENCES company(company_id),
+    CONSTRAINT fk_ma_acquired_company
+        FOREIGN KEY (acquired_company_id) REFERENCES company(company_id)
+);
+
+CREATE TABLE macro_indicators (
+    macro_id INT AUTO_INCREMENT PRIMARY KEY,
+    indicator_date DATE NOT NULL,
+    gdp DECIMAL(15,2),
+    cpi DECIMAL(10,2),
+    unemployment_rate DECIMAL(5,2),
+    interest_rate DECIMAL(5,2),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE industry_reports (
+    report_id INT AUTO_INCREMENT PRIMARY KEY,
+    industry_name VARCHAR(255) NOT NULL,
+    report_title VARCHAR(255),
+    report_date DATE,
+    content LONGTEXT,
+    link VARCHAR(500),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE regulations (
+    regulation_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    effective_date DATE,
+    jurisdiction VARCHAR(255),
+    summary TEXT,
+    link VARCHAR(500),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE market_sentiment (
+    sentiment_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT,
+    sentiment_date DATETIME NOT NULL,
+    sentiment_score DECIMAL(5,2),
+    source VARCHAR(255),
+    key_phrases TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_market_sentiment_company
+        FOREIGN KEY (company_id) REFERENCES company(company_id)
+);
+
+CREATE TABLE debt_interest_rates (
+    debt_id INT AUTO_INCREMENT PRIMARY KEY,
+    company_id INT,
+    date DATE NOT NULL,
+    bond_yield DECIMAL(5,2),
+    credit_rating VARCHAR(10),
+    spread DECIMAL(5,2),
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_debt_interest_company
+        FOREIGN KEY (company_id) REFERENCES company(company_id)
+);
+
+-- Create indexes for performance (optional)
+CREATE INDEX idx_company_ticker ON company (ticker);
+CREATE INDEX idx_sec_filing_company_date ON sec_filing (company_id, filing_date);
+CREATE INDEX idx_market_data_company_date ON market_data (company_id, data_date);
