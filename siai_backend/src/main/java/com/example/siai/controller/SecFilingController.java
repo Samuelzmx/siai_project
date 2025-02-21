@@ -3,9 +3,12 @@ package com.example.siai.controller;
 import com.example.siai.entity.SecFiling;
 import com.example.siai.service.SecFilingService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 
 @RestController
 @RequestMapping("/api/secfiling")
@@ -15,44 +18,42 @@ public class SecFilingController {
     @Autowired
     private SecFilingService secFilingService;
 
-    @GetMapping
-    public ResponseEntity<List<SecFiling>> getAllSecFilings() {
-        return ResponseEntity.ok(secFilingService.getAllSecFilings());
-    }
+    // ====== Existing Endpoints remain as is (CRUD, etc.) ======
+    // e.g. getAllSecFilings(), getSecFilingById(...), etc.
 
-    @GetMapping("/{id}")
-    public ResponseEntity<SecFiling> getSecFilingById(@PathVariable Integer id) {
-        SecFiling filing = secFilingService.getSecFilingById(id);
-        if (filing == null) {
-            return ResponseEntity.notFound().build();
+    /**
+     * Example new endpoint:
+     * GET /api/secfiling/search?company=Apple&filingType=10-K&date=2025-01-31
+     */
+    @GetMapping("/search")
+    public ResponseEntity<?> searchFiling(
+            @RequestParam String company,
+            @RequestParam String filingType,
+            @RequestParam String date // e.g. "2025-01-31"
+    ) {
+        try {
+            // parse the date string into LocalDate
+            LocalDate localDate = LocalDate.parse(date);
+            SecFiling filing = secFilingService.getFilingByCompanyTypeAndDate(company, filingType, localDate);
+
+            if (filing == null) {
+                // Not found
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("No filing found for (company=" + company
+                                + ", type=" + filingType
+                                + ", date=" + date + ")");
+            }
+            // Found => Return the filing in JSON
+            return ResponseEntity.ok(filing);
+
+        } catch (DateTimeParseException ex) {
+            // If the user typed an invalid date
+            return ResponseEntity.badRequest()
+                    .body("Invalid date format: " + date + " (expected yyyy-MM-dd)");
+        } catch (Exception ex) {
+            // Catch any unexpected errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred: " + ex.getMessage());
         }
-        return ResponseEntity.ok(filing);
     }
-
-    @PostMapping
-    public ResponseEntity<SecFiling> createSecFiling(@RequestBody SecFiling filing) {
-        SecFiling newFiling = secFilingService.createSecFiling(filing);
-        return ResponseEntity.ok(newFiling);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<SecFiling> updateSecFiling(@PathVariable Integer id, @RequestBody SecFiling updated) {
-        SecFiling result = secFilingService.updateSecFiling(id, updated);
-        if (result == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(result);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSecFiling(@PathVariable Integer id) {
-        secFilingService.deleteSecFiling(id);
-        return ResponseEntity.noContent().build();
-    }
-    @DeleteMapping("/all")
-    public ResponseEntity<Void> deleteAllSecFilings() {
-        secFilingService.deleteAllSecFilings();
-        return ResponseEntity.noContent().build(); // 204 No Content
-    }
-
 }

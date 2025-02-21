@@ -1,14 +1,15 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns="http://maven.apache.org/POM/4.0.0" 
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
                              https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <!-- Inherits version management & defaults from Spring Boot 3.0.5 BOM -->
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.0.5</version> <!-- or another 3.x release -->
-    <relativePath/>
+    <version>3.0.5</version>
+    <relativePath/> 
   </parent>
 
   <groupId>com.example</groupId>
@@ -18,22 +19,24 @@
 
   <properties>
     <java.version>17</java.version>
+    <!-- This ensures that the plugin picks up Java 17 -->
+    <!-- spring-boot.version is inherited from the parent -->
   </properties>
 
   <dependencies>
-    <!-- Spring Boot Web -->
+    <!-- Spring Boot Web: for creating RESTful APIs (Tomcat, etc.) -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- Spring Data JPA -->
+    <!-- Spring Data JPA: pulls in Hibernate (Jakarta) & JPA annotation support -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
     </dependency>
 
-    <!-- MySQL Driver -->
+    <!-- MySQL driver: for connecting to MySQL DB at runtime -->
     <dependency>
       <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
@@ -43,10 +46,12 @@
 
   <build>
     <plugins>
+      <!-- Spring Boot Maven plugin: to package and run your application easily -->
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <version>3.0.5</version>
+        <!-- Usually the version is inherited from the Spring Boot parent BOM, 
+             so you can omit <version> if you wish. It's optional here. -->
         <configuration>
           <mainClass>com.example.siai.SiaiApplication</mainClass>
         </configuration>

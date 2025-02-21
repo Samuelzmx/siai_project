@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SecFilingRepository extends JpaRepository<SecFiling, Integer> {
@@ -25,4 +26,14 @@ public interface SecFilingRepository extends JpaRepository<SecFiling, Integer> {
     // 4) JPQL for date range
     @Query("SELECT s FROM SecFiling s WHERE s.filingDate BETWEEN :startDate AND :endDate")
     List<SecFiling> findFilingsBetweenDates(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    @Query("SELECT s FROM SecFiling s " +
+           "WHERE s.company.name = :companyName " +
+           "AND LOWER(s.filingType) = LOWER(:filingType) " +
+           "AND s.filingDate = :filingDate")
+    Optional<SecFiling> findByCompanyNameAndTypeAndDate(
+        @Param("companyName") String companyName,
+        @Param("filingType")  String filingType,
+        @Param("filingDate")  Date filingDate
+    );
 }
