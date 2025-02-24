@@ -1,0 +1,7 @@
+Ticker,CIK,Filing Year,Form Type,File Path,URL
+AAPL,0000320193,2021,10-K,SEC_Filings/AAPL_2021_10-K.html,https://www.sec.gov/Archives/edgar/data/0000320193/000032019321000105/aapl-20210925.htm
+MSFT,0000789019,2021,10-K,SEC_Filings/MSFT_2021_10-K.html,https://www.sec.gov/Archives/edgar/data/0000789019/000156459021039151/msft-10k_20210630.htm
+TSLA,0001318605,2021,10-K,SEC_Filings/TSLA_2021_10-K.html,https://www.sec.gov/Archives/edgar/data/0001318605/000156459021004599/tsla-10k_20201231.htm
+AMZN,0001018724,2021,10-K,SEC_Filings/AMZN_2021_10-K.html,https://www.sec.gov/Archives/edgar/data/0001018724/000101872421000004/amzn-20201231.htm
+AAPL,0000320193,2020,10-K,SEC_Filings/AAPL_2020_10-K.html,https://www.sec.gov/Archives/edgar/data/0000320193/000032019320000096/aapl-20200926.htm
+AMZN,0001018724,2022,10-K,SEC_Filings/AMZN_2022_10-K.html,https://www.sec.gov/Archives/edgar/data/0001018724/000101872422000005/amzn-20211231.htm
